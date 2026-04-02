@@ -516,7 +516,7 @@ function addRow(type) {
   const tr = document.createElement('tr');
   tr.id = `tr-${id}`;
   tr.innerHTML = `
-    <td><input type="text" class="name" value="${type==='warp'?'Zemin':'Zemin'}" style="min-width:70px"></td>
+    <td><input type="text" class="name" value="${type==='warp'?'Çözgü':'Atkı'}" style="min-width:70px"></td>
     <td><input type="number" class="n" value="20" min="0.1" step="0.5" style="width:50px"
         oninput="updateCv(${id})" onchange="updateCv(${id})"></td>
     <td><select class="u" style="width:82px" onchange="updateCv(${id})">
