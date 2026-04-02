@@ -1,486 +1,830 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dokuma Ham Maliyet · HENTEKS</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#0d0f14;--surface:#13161e;--surface2:#1a1e2a;--surface3:#21263a;
-  --border:#2a2f42;--border2:#363d56;
-  --accent:#4f8ef7;--accent2:#7eb8ff;
-  --warp:#f7a24f;--warp2:#ffc97e;
-  --weft:#4ff7a8;--weft2:#7effcc;
-  --danger:#f7514f;--text:#e8ecf5;--text2:#9099b8;--text3:#5a6080;
-  --success:#4ff7a8;--extra:#c47fff;
-  --mono:'JetBrains Mono',monospace;--sans:'Syne',sans-serif;
+/* ══ TEMA DEĞİŞKENLERİ ══ */
+[data-theme="dark"] {
+  --bg:#080a0f; --s1:#0e1118; --s2:#141820; --s3:#1c2230; --s4:#242d3e;
+  --b1:#1e2535; --b2:#2e3a50; --b3:#3d4f6a;
+  --text:#dde3f0; --t2:#8896b0; --t3:#4a5568; --t4:#2d3748;
+  --grid-line:rgba(74,158,255,.018);
+  --topbar-bg:rgba(8,10,15,.94);
+  --shadow:0 4px 20px rgba(0,0,0,.4);
+  --inp-bg:var(--s3); --inp-border:var(--b1); --inp-focus-bg:var(--s4);
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--mono);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+[data-theme="light"] {
+  --bg:#f0f2f7; --s1:#ffffff; --s2:#f5f7fb; --s3:#eaecf3; --s4:#dde1ee;
+  --b1:#d0d5e8; --b2:#b8bfd6; --b3:#9aa3c0;
+  --text:#1a2035; --t2:#4a5568; --t3:#9aa3bf; --t4:#c8cdd8;
+  --grid-line:rgba(74,100,200,.03);
+  --topbar-bg:rgba(240,242,247,.96);
+  --shadow:0 4px 20px rgba(0,0,0,.08);
+  --inp-bg:#fff; --inp-border:var(--b1); --inp-focus-bg:#f8f9ff;
+}
 
-.header{background:var(--surface);border-bottom:1px solid var(--border);padding:13px 26px;display:flex;align-items:center;gap:13px;position:sticky;top:0;z-index:100}
-.header-logo{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.2em;color:var(--text3);text-transform:uppercase}
-.header-sep{width:1px;height:24px;background:var(--border)}
-.header-title{font-family:var(--sans);font-size:15px;font-weight:700;color:var(--text)}
+/* aksan renkleri her iki temada aynı */
+:root {
+  --warp:#e8933a; --warp2:#ffc07a; --warp-g:rgba(232,147,58,.10);
+  --weft:#1cb870; --weft2:#3ae8a0; --weft-g:rgba(58,232,160,.08);
+  --blue:#4a9eff; --blue-g:rgba(74,158,255,.10);
+  --purple:#b87fff; --purple-g:rgba(184,127,255,.10);
+  --red:#ff5050; --green:#3ae8a0;
+  --mono:'IBM Plex Mono',monospace; --sans:'DM Sans',sans-serif; --r:6px;
+}
 
-.container{max-width:1360px;margin:0 auto;padding:20px 18px 60px}
-.grid-main{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-@media(max-width:900px){.grid-main{grid-template-columns:1fr}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--mono);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .25s,color .25s}
 
-.card{background:var(--surface);border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:16px}
-.card-header{padding:11px 17px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--border)}
-.card-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.dot-warp{background:var(--warp);box-shadow:0 0 7px var(--warp)}
-.dot-weft{background:var(--weft);box-shadow:0 0 7px var(--weft)}
-.dot-cfg{background:var(--accent);box-shadow:0 0 7px var(--accent)}
-.dot-extra{background:var(--extra);box-shadow:0 0 7px var(--extra)}
-.card-title{font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
-.title-warp{color:var(--warp2)}.title-weft{color:var(--weft2)}.title-cfg{color:var(--accent2)}
-.card-body{padding:15px 17px}
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+  background-size:44px 44px;pointer-events:none;z-index:0;
+}
 
-.params-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px 10px;margin-top:12px}
-.field{display:flex;flex-direction:column;gap:4px}
-.field-label{font-size:9px;letter-spacing:.1em;color:var(--text3);text-transform:uppercase}
+/* ── HEADER ── */
+.topbar{
+  position:sticky;top:0;z-index:200;
+  background:var(--topbar-bg);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--b1);
+  padding:0 20px;height:50px;
+  display:flex;align-items:center;gap:0;
+  transition:background .25s,border-color .25s;
+}
+.tb-brand{font-family:var(--sans);font-weight:800;font-size:13px;letter-spacing:.18em;color:var(--blue);text-transform:uppercase;padding-right:16px;border-right:1px solid var(--b1);margin-right:16px}
+.tb-title{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--text)}
+.tb-mod{font-size:10px;color:var(--t3);margin-left:5px}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
 
-input,select,textarea{background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:11.5px;padding:5px 7px;outline:none;transition:border-color .15s;width:100%}
-input:focus,textarea:focus{border-color:var(--accent)}
+/* kur pill */
+.kur-pill{display:flex;align-items:center;gap:7px;background:var(--s2);border:1px solid var(--b1);border-radius:20px;padding:4px 12px;font-size:11px}
+.kur-dot{width:6px;height:6px;border-radius:50%;background:var(--t3);transition:background .3s;flex-shrink:0}
+.kur-dot.live{background:var(--green);box-shadow:0 0 6px var(--green);animation:blink 2s infinite}
+.kur-dot.err{background:var(--warp)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* tema toggle butonu */
+.theme-btn{
+  display:flex;align-items:center;gap:6px;
+  background:var(--s2);border:1px solid var(--b1);border-radius:20px;
+  padding:4px 11px;cursor:pointer;font-family:var(--mono);font-size:11px;
+  color:var(--t2);transition:all .15s;white-space:nowrap;
+}
+.theme-btn:hover{background:var(--s3);color:var(--text)}
+.theme-icon{font-size:13px;line-height:1}
+
+/* ── LAYOUT ── */
+.wrap{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:18px 16px 80px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:880px){.two-col{grid-template-columns:1fr}}
+
+/* ── PANEL ── */
+.panel{background:var(--s1);border:1px solid var(--b1);border-radius:10px;overflow:hidden;transition:border-color .2s,background .25s;animation:fadeUp .28s ease both;box-shadow:var(--shadow)}
+.panel:focus-within{border-color:var(--b2)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.ph{display:flex;align-items:center;gap:9px;padding:10px 15px;border-bottom:1px solid var(--b1);background:var(--s2);transition:background .25s}
+.ph-ico{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.ic-w{background:rgba(232,147,58,.14)}.ic-a{background:rgba(58,232,160,.11)}
+.ic-c{background:rgba(74,158,255,.11)}.ic-e{background:rgba(184,127,255,.11)}
+.ph-title{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+.tc-w{color:var(--warp2)}.tc-a{color:var(--weft2)}.tc-c{color:var(--blue)}.tc-e{color:var(--purple)}
+.ph-badge{margin-left:auto;font-size:9px;letter-spacing:.1em;padding:2px 8px;border-radius:20px;background:var(--s3);color:var(--t3);border:1px solid var(--b1)}
+.pb{padding:13px 15px}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:10px}
+.tbl thead th{text-align:left;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);padding:0 4px 6px;border-bottom:1px solid var(--b1)}
+.tbl tbody td{padding:4px 3px;border-bottom:1px solid var(--b1);vertical-align:middle}
+.tbl tbody tr:last-child td{border-bottom:none}
+
+/* badge alt satır */
+.cv-row td{padding:1px 4px 5px;border-bottom:1px solid var(--b1)}
+.cv-wrap{display:flex;gap:4px;flex-wrap:wrap}
+.cv{font-size:9px;padding:2px 6px;border-radius:3px;white-space:nowrap;font-family:var(--mono)}
+.cv-d {background:rgba(232,147,58,.13);color:var(--warp2);border:1px solid rgba(232,147,58,.25)}
+.cv-dt{background:rgba(58,232,160,.10);color:var(--weft2);border:1px solid rgba(58,232,160,.22)}
+.cv-t {background:rgba(74,158,255,.10);color:var(--blue); border:1px solid rgba(74,158,255,.22)}
+.cv-ne{background:rgba(184,127,255,.10);color:var(--purple);border:1px solid rgba(184,127,255,.22)}
+
+/* ── INPUTS ── */
+input,select,textarea{
+  background:var(--inp-bg);border:1px solid var(--inp-border);border-radius:var(--r);
+  color:var(--text);font-family:var(--mono);font-size:11px;padding:5px 7px;
+  outline:none;width:100%;transition:border-color .15s,background .15s;-webkit-appearance:none;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);background:var(--inp-focus-bg)}
 input[type=number]{text-align:right}
-textarea{resize:vertical;min-height:60px}
+select option{background:var(--s3)}
+textarea{resize:vertical;min-height:56px}
 
-.yarn-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:11px}
-.yarn-table th{text-align:left;color:var(--text3);font-size:9px;padding:0 4px 6px;border-bottom:1px solid var(--border)}
-.yarn-table td{padding:4px 3px;border-bottom:1px solid rgba(42,47,66,0.45)}
+/* ── PARAMS ── */
+.pg4{display:grid;grid-template-columns:repeat(4,1fr);gap:7px 10px;margin-top:11px}
+@media(max-width:540px){.pg4{grid-template-columns:1fr 1fr}}
+.field{display:flex;flex-direction:column;gap:3px}
+.fl{font-size:9px;font-weight:600;letter-spacing:.11em;color:var(--t3);text-transform:uppercase;white-space:nowrap}
 
-.btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:6px;border:none;font-family:var(--mono);font-size:11px;cursor:pointer;transition:0.15s}
-.btn-warp{background:rgba(247,162,79,0.1);color:var(--warp2);border:1px solid rgba(247,162,79,0.2)}
-.btn-weft{background:rgba(79,247,168,0.1);color:var(--weft2);border:1px solid rgba(79,247,168,0.2)}
-.btn-extra{background:rgba(196,127,255,0.1);color:#e0b8ff;border:1px solid rgba(196,127,255,0.2)}
-.btn-calc{background:linear-gradient(135deg,#4f8ef7,#7eb8ff);color:#0d0f14;font-weight:700;padding:12px 30px;border-radius:8px;font-size:14px}
-.btn-print{background:var(--surface3);color:var(--text);border:1px solid var(--border2);margin-left:10px}
-.btn-wa{background:#25d366;color:#000;font-weight:700;margin-top:10px;width:100%;justify-content: center;}
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:6px 13px;border-radius:var(--r);border:1px solid transparent;font-family:var(--mono);font-size:11px;cursor:pointer;transition:.15s;white-space:nowrap}
+.btn-w{background:var(--warp-g);color:var(--warp2);border-color:rgba(232,147,58,.2)}
+.btn-w:hover{background:rgba(232,147,58,.18);border-color:var(--warp)}
+.btn-a{background:var(--weft-g);color:var(--weft2);border-color:rgba(58,232,160,.18)}
+.btn-a:hover{background:rgba(58,232,160,.18);border-color:var(--weft)}
+.btn-e{background:var(--purple-g);color:var(--purple);border-color:rgba(184,127,255,.2)}
+.btn-e:hover{background:rgba(184,127,255,.18);border-color:var(--purple)}
+.btn-del{background:none;border:none;color:var(--t3);font-size:14px;cursor:pointer;padding:3px 7px;border-radius:4px;transition:color .12s,background .12s;line-height:1}
+.btn-del:hover{color:var(--red);background:rgba(255,80,80,.1)}
+.btn-calc{background:linear-gradient(135deg,#4a9eff,#7ac0ff);color:#060810;font-family:var(--sans);font-weight:700;font-size:13px;padding:10px 26px;border-radius:8px;border:none;letter-spacing:.03em;box-shadow:0 4px 20px rgba(74,158,255,.28);cursor:pointer}
+.btn-calc:hover{opacity:.88;transform:translateY(-1px)}
+.btn-sec{background:var(--s2);color:var(--t2);border:1px solid var(--b1);font-family:var(--sans);font-size:12px;padding:8px 16px;border-radius:var(--r);cursor:pointer}
+.btn-sec:hover{background:var(--s3);color:var(--text)}
+.btn-wa{background:#1da851;color:#fff;font-family:var(--sans);font-weight:700;font-size:12px;padding:10px;border-radius:var(--r);border:none;width:100%;margin-top:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-wa:hover{background:#17923f}
 
-.result-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;margin-top:16px;overflow:hidden}
-.res-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));border-bottom:1px solid var(--border)}
-.res-item{padding:20px;border-right:1px solid var(--border)}
-.res-label{font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:5px}
-.res-val{font-family:var(--sans);font-size:22px;font-weight:700}
-.res-val.total{color:var(--success);font-size:28px}
+.divl{height:1px;background:linear-gradient(90deg,var(--b1),transparent);margin:11px 0}
 
-.res-breakdown{padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:10px 40px}
-.break-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px dashed var(--border)}
+/* ── FİŞ TOGGLE (görsel switch) ── */
+.fis-opts{display:flex;flex-direction:column;gap:8px;margin-top:9px}
+.tog-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tog-label{font-size:11px;color:var(--t2)}
+.tog{position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tog-track{
+  position:absolute;inset:0;border-radius:20px;
+  background:var(--s3);border:1px solid var(--b2);
+  transition:background .2s,border-color .2s;cursor:pointer;
+}
+.tog input:checked + .tog-track{background:var(--blue);border-color:var(--blue)}
+.tog-thumb{
+  position:absolute;top:3px;left:3px;
+  width:12px;height:12px;border-radius:50%;
+  background:#fff;transition:transform .2s;pointer-events:none;
+}
+.tog input:checked ~ .tog-thumb{transform:translateX(16px)}
 
-.plan-panel{background:var(--surface2);border-top:1px solid var(--border);padding:20px}
-.plan-title{font-size:11px;color:var(--text2);margin-bottom:15px;display:flex;align-items:center;gap:8px}
+/* ── RESULT ── */
+.res-panel{background:var(--s1);border:1px solid var(--b1);border-radius:10px;overflow:hidden;margin-top:12px;animation:fadeUp .3s ease;box-shadow:var(--shadow)}
+.res-top{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--b1)}
+@media(max-width:680px){.res-top{grid-template-columns:1fr 1fr}}
+.rc{padding:16px 18px;border-right:1px solid var(--b1)}
+.rc:last-child{border-right:none}
+.rc-lbl{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.rc-val{font-family:var(--sans);font-size:19px;font-weight:700}
+.rc-val.big{font-size:25px;color:var(--green)}
+.rc-val.blue{color:var(--blue);font-size:21px}
+.rc-sub{font-size:10px;color:var(--t3);margin-top:2px}
 
-#fis-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);z-index:1000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
-.fis-content{background:#fff;color:#000;width:100%;max-width:520px;padding:35px;border-radius:2px;font-family:var(--mono);box-shadow:0 25px 60px rgba(0,0,0,0.6);position:relative;max-height: 95vh; overflow-y: auto;}
-.fis-header{text-align:center;border-bottom:2px solid #000;padding-bottom:15px;margin-bottom:15px}
-.fis-logo{font-family:var(--sans);font-weight:800;font-size:22px;letter-spacing:3px}
-.fis-section-title{font-size:10px;font-weight:800;text-decoration:underline;margin:12px 0 5px 0;text-transform:uppercase}
-.fis-row{display:flex;justify-content:space-between;padding:4px 0;font-size:11px;line-height:1.4}
-.fis-total{border-top:2px solid #000;margin-top:15px;padding-top:10px;font-weight:800;font-size:16px}
-.fis-footer{text-align:center;font-size:9px;margin-top:25px;color:#444;border-top:1px dashed #ccc;padding-top:10px}
-.check-field{display:flex; align-items:center; gap:8px; cursor:pointer; font-size:11px; color:var(--text2); user-select:none}
-.check-field input{width:16px; height:16px; cursor:pointer}
+.needs-wrap{background:var(--s2);border-top:1px solid var(--b1);padding:14px 18px}
+.needs-hd{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.needs-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+@media(max-width:540px){.needs-grid{grid-template-columns:1fr}}
+.needs-box{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:10px 13px}
+.nb-title{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}
+.nb-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px dashed var(--b1);font-size:11px;gap:8px}
+.nb-row:last-child{border-bottom:none}
+.nb-name{color:var(--t2);flex:1;font-size:10.5px}
+.nb-kg{font-weight:600;white-space:nowrap}
+.nb-kg.w{color:var(--warp2)}.nb-kg.a{color:var(--weft2)}
+
+.bkd{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--b1)}
+@media(max-width:560px){.bkd{grid-template-columns:1fr}}
+.bkd-col{padding:12px 18px}
+.bkd-col:first-child{border-right:1px solid var(--b1)}
+.bk-row{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;padding:4px 0;border-bottom:1px dashed var(--b1);gap:10px}
+.bk-row:last-child{border-bottom:none}
+.bk-lbl{color:var(--t2)}
+.bk-val{font-weight:600}
+.bk-warp{color:var(--warp2)}.bk-weft{color:var(--weft2)}.bk-work{color:var(--blue)}.bk-extra{color:var(--purple)}.bk-total{color:var(--green);font-size:13px}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(4,6,12,.88);backdrop-filter:blur(10px);z-index:500;align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal-box{
+  background:#fafafa;color:#111;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;
+  border-radius:6px;padding:30px 28px;font-family:var(--mono);font-size:11px;
+  box-shadow:0 30px 80px rgba(0,0,0,.7);animation:fadeUp .2s ease;
+}
+.fis-logo{font-family:var(--sans);font-weight:900;font-size:22px;letter-spacing:4px;text-align:center;color:#111}
+.fis-tag{text-align:center;font-size:9px;letter-spacing:2px;font-weight:700;margin-top:3px;color:#555}
+.fis-hl{border:none;border-top:2px solid #111;margin:14px 0}
+.fis-hl2{border:none;border-top:1px dashed #bbb;margin:8px 0}
+.fis-st{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;text-decoration:underline;margin:10px 0 5px;color:#222}
+.fis-row{display:flex;justify-content:space-between;align-items:flex-start;padding:3px 0;font-size:11px;line-height:1.4;gap:8px}
+.fis-row span:first-child{color:#444}
+.fis-row span:last-child{font-weight:700;color:#111;white-space:nowrap}
+.fis-total{background:#111;color:#fff;padding:12px 14px;border-radius:3px;margin-top:12px}
+.fis-total .fis-row{font-size:17px;font-weight:900}
+.fis-total .fis-row span:first-child{color:#aaa}
+.fis-total .fis-row span:last-child{color:#fff}
+.fis-footer{text-align:center;font-size:9px;color:#888;margin-top:18px;border-top:1px dashed #ddd;padding-top:10px}
+.fis-prod-hd{display:flex;justify-content:space-between;font-size:9px;font-weight:800;padding:4px 0;border-bottom:1px solid #ddd;color:#333;text-transform:uppercase;letter-spacing:.08em}
+.fis-prod-row{display:flex;justify-content:space-between;font-size:10px;padding:4px 0;border-bottom:1px dashed #eee;gap:8px;line-height:1.5}
+.fis-prod-row span:last-child{font-weight:700;white-space:nowrap}
+.modal-close-btn{width:100%;margin-top:8px;padding:9px;background:#ebebeb;border:1px solid #d5d5d5;border-radius:4px;font-family:var(--mono);font-weight:700;cursor:pointer;font-size:11px;letter-spacing:.06em}
+.modal-close-btn:hover{background:#ddd}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:4px}
 </style>
 </head>
 <body>
 
-<header class="header">
-  <span class="header-logo">HENTEKS</span>
-  <div class="header-sep"></div>
-  <span class="header-title">Dokuma Teknik Maliyet Analizi</span>
+<!-- ══ HEADER ══ -->
+<header class="topbar">
+  <span class="tb-brand">HENTEKS</span>
+  <span class="tb-title">Dokuma Teknik Maliyet</span>
+  <span class="tb-mod">· ERP</span>
+  <div class="tb-right">
+    <!-- tema toggle -->
+    <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">
+      <span class="theme-icon" id="theme-icon">☀️</span>
+      <span id="theme-lbl">Açık Tema</span>
+    </button>
+    <!-- kur -->
+    <div class="kur-pill">
+      <div class="kur-dot" id="kur-dot"></div>
+      <span style="color:var(--t2);font-size:10px">USD/TRY</span>
+      <span style="font-weight:600;color:var(--green);font-size:12px" id="header-kur">—</span>
+    </div>
+  </div>
 </header>
 
-<div class="container">
-  <div class="grid-main">
+<div class="wrap">
+  <div class="two-col">
+
     <!-- ÇÖZGÜ -->
-    <div class="card">
-      <div class="card-header"><div class="card-dot dot-warp"></div><span class="card-title title-warp">Çözgü İplikleri</span></div>
-      <div class="card-body">
-        <table class="yarn-table">
-          <thead><tr><th>İplik Adı</th><th>No</th><th>Birim</th><th>Kat</th><th>Rapor</th><th>$/kg</th><th style="width:30px"></th></tr></thead>
+    <div class="panel" style="animation-delay:.04s">
+      <div class="ph"><div class="ph-ico ic-w">🧵</div><span class="ph-title tc-w">Çözgü İplikleri</span><span class="ph-badge">WARP</span></div>
+      <div class="pb">
+        <table class="tbl">
+          <thead><tr>
+            <th>İplik Adı</th><th>No</th><th>Birim</th>
+            <th title="Büküm/Kat">Kat</th>
+            <th title="Rapordaki tel adedi">Rapor</th>
+            <th>$/kg</th><th style="width:24px"></th>
+          </tr></thead>
           <tbody id="warp-body"></tbody>
         </table>
-        <button class="btn btn-warp" onclick="addRow('warp')">+ Çözgü Ekle</button>
-        <div class="params-grid">
-          <div class="field"><label class="field-label">Tarak No</label><input type="number" id="reed-no" value="24"></div>
-          <div class="field"><label class="field-label">Diş Sıklığı</label><input type="number" id="reed-dent" value="2"></div>
-          <div class="field"><label class="field-label">Tarak Eni (cm)</label><input type="number" id="warp-width" value="170"></div>
-          <div class="field"><label class="field-label">Fire (%)</label><input type="number" id="warp-waste" value="3"></div>
+        <button class="btn btn-w" onclick="addRow('warp')">
+          <svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>+ Çözgü Ekle
+        </button>
+        <div class="divl"></div>
+        <div class="pg4">
+          <div class="field"><label class="fl">Tarak No</label><input type="number" id="reed-no" value="24" min="1" step="0.5"></div>
+          <div class="field"><label class="fl">Diş/Tel</label><input type="number" id="reed-dent" value="2" min="1" max="12"></div>
+          <div class="field"><label class="fl">Tarak Eni (cm)</label><input type="number" id="warp-width" value="170" min="10"></div>
+          <div class="field"><label class="fl">Fire (%)</label><input type="number" id="warp-waste" value="3" min="0" max="40" step="0.1"></div>
         </div>
       </div>
     </div>
 
     <!-- ATKI -->
-    <div class="card">
-      <div class="card-header"><div class="card-dot dot-weft"></div><span class="card-title title-weft">Atkı İplikleri</span></div>
-      <div class="card-body">
-        <table class="yarn-table">
-          <thead><tr><th>İplik Adı</th><th>No</th><th>Birim</th><th>Kat</th><th>Rapor</th><th>$/kg</th><th style="width:30px"></th></tr></thead>
+    <div class="panel" style="animation-delay:.08s">
+      <div class="ph"><div class="ph-ico ic-a">🪡</div><span class="ph-title tc-a">Atkı İplikleri</span><span class="ph-badge">WEFT</span></div>
+      <div class="pb">
+        <table class="tbl">
+          <thead><tr>
+            <th>İplik Adı</th><th>No</th><th>Birim</th>
+            <th>Kat</th><th>Rapor</th><th>$/kg</th><th style="width:24px"></th>
+          </tr></thead>
           <tbody id="weft-body"></tbody>
         </table>
-        <button class="btn btn-weft" onclick="addRow('weft')">+ Atkı Ekle</button>
-        <div class="params-grid">
-          <div class="field"><label class="field-label">Atkı Sıklığı (cm)</label><input type="number" id="weft-dens" value="20"></div>
-          <div class="field"><label class="field-label">Atkı Eni (cm)</label><input type="number" id="weft-width" value="175"></div>
-          <div class="field"><label class="field-label">İşçilik ($/Atkı)</label><input type="number" id="weave-price" value="0.04" step="0.001"></div>
-          <div class="field"><label class="field-label">Fire (%)</label><input type="number" id="weft-waste" value="5"></div>
+        <button class="btn btn-a" onclick="addRow('weft')">
+          <svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>+ Atkı Ekle
+        </button>
+        <div class="divl"></div>
+        <div class="pg4">
+          <div class="field"><label class="fl">Atkı Sıklığı (/cm)</label><input type="number" id="weft-dens" value="20" min="1" step="0.5"></div>
+          <div class="field"><label class="fl">Atkı Eni (cm)</label><input type="number" id="weft-width" value="175" min="10"></div>
+          <div class="field"><label class="fl">İşçilik ($/atkı)</label><input type="number" id="weave-price" value="0.04" min="0" step="0.001"></div>
+          <div class="field"><label class="fl">Fire (%)</label><input type="number" id="weft-waste" value="5" min="0" max="40" step="0.1"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="grid-main">
-      <div class="card">
-        <div class="card-header"><div class="card-dot dot-cfg" style="background:var(--text2)"></div><span class="card-title">Kumaş Detayları & Notlar</span></div>
-        <div class="card-body">
-            <div class="params-grid" style="grid-template-columns: 1fr 1fr; margin-top:0">
-                <div class="field">
-                    <label class="field-label">Müşteri / Proje</label>
-                    <input type="text" id="cust-name" placeholder="Müşteri adını yazın...">
-                </div>
-                <div class="field">
-                    <label class="field-label">Örgü / Armür</label>
-                    <input type="text" id="weave-type" value="Bez Ayağı">
-                </div>
-            </div>
-            <div class="field" style="margin-top:12px">
-              <label class="field-label">Notlar / Açıklama</label>
-              <textarea id="app-notes" placeholder="Teknik notlar, termine dair detaylar..."></textarea>
-            </div>
-            <div style="margin-top:10px; display:flex; gap:15px">
-              <label class="check-field"><input type="checkbox" id="show-notes-on-fis" checked> Fişte Notları Göster</label>
-            </div>
+  <div class="two-col">
+
+    <!-- KUMAŞ DETAY -->
+    <div class="panel" style="animation-delay:.12s">
+      <div class="ph"><div class="ph-ico ic-c">📋</div><span class="ph-title tc-c">Kumaş Detayları & Notlar</span></div>
+      <div class="pb">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 12px">
+          <div class="field"><label class="fl">Müşteri / Proje</label><input type="text" id="cust-name" placeholder="Müşteri adı…"></div>
+          <div class="field"><label class="fl">Örgü / Armür</label><input type="text" id="weave-type" value="Bez Ayağı"></div>
+        </div>
+        <div class="field" style="margin-top:9px">
+          <label class="fl">Notlar / Açıklama</label>
+          <textarea id="app-notes" placeholder="Teknik notlar, termine dair detaylar…"></textarea>
+        </div>
+        <!-- FİŞ OPSİYONLARI — görsel toggle -->
+        <div class="fis-opts">
+          <div class="tog-row">
+            <span class="tog-label">Fişte notları göster</span>
+            <label class="tog">
+              <input type="checkbox" id="show-notes-on-fis" checked>
+              <div class="tog-track"></div>
+              <div class="tog-thumb"></div>
+            </label>
+          </div>
+          <div class="tog-row">
+            <span class="tog-label">Fişte üretim planını göster</span>
+            <label class="tog">
+              <input type="checkbox" id="show-prod-on-fis" checked>
+              <div class="tog-track"></div>
+              <div class="tog-thumb"></div>
+            </label>
+          </div>
         </div>
       </div>
+    </div>
 
-      <div class="card">
-        <div class="card-header"><div class="card-dot dot-extra"></div><span class="card-title title-extra">Ek Giderler</span></div>
-        <div class="card-body">
-          <table class="yarn-table" style="margin-bottom:10px">
-            <thead><tr><th>Açıklama</th><th>Tutar ($)</th><th>Birim</th><th style="width:30px"></th></tr></thead>
-            <tbody id="extra-body"></tbody>
-          </table>
-          <button class="btn btn-extra" onclick="addExtraRow()">+ Gider Ekle</button>
-        </div>
-      </div>
-  </div>
-
-  <div class="card">
-    <div class="card-header"><div class="card-dot dot-cfg"></div><span class="card-title title-cfg">Üretim Planlama</span></div>
-    <div class="card-body">
-      <div style="display:flex; gap:20px; align-items:flex-end; flex-wrap: wrap;">
-        <div class="field" style="width:180px">
-          <label class="field-label">Üretilecek Metre</label>
-          <input type="number" id="target-m" value="1000" oninput="calculate()">
-        </div>
-        <div class="field" style="margin-bottom: 8px;">
-            <label class="check-field"><input type="checkbox" id="show-prod-on-fis" checked> Fişte Üretimi Göster</label>
-        </div>
-        <div class="field" style="width:150px">
-          <label class="field-label">USD/TRY KURU</label>
-          <input type="number" id="fx" value="34.20" step="0.01">
-        </div>
-        <div style="flex-grow: 1; display:flex; justify-content: flex-end; gap: 10px;">
-            <button class="btn btn-calc" onclick="calculate()">HESAPLA VE ANALİZ ET</button>
-            <button class="btn btn-print" onclick="openFis()">FİŞ OLUŞTUR</button>
-        </div>
+    <!-- EK GİDERLER -->
+    <div class="panel" style="animation-delay:.15s">
+      <div class="ph"><div class="ph-ico ic-e">➕</div><span class="ph-title tc-e">Ek Giderler</span><span class="ph-badge">$/metre</span></div>
+      <div class="pb">
+        <table class="tbl">
+          <thead><tr><th>Açıklama</th><th>Tutar ($)</th><th style="width:24px"></th></tr></thead>
+          <tbody id="extra-body"></tbody>
+        </table>
+        <button class="btn btn-e" onclick="addExtraRow()">
+          <svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>+ Gider Ekle
+        </button>
+        <p style="font-size:10px;color:var(--t3);margin-top:9px;line-height:1.6">
+          Çözgü hazırlama, devere işçiliği, boyama, apre vb. sabit $/metre olarak eklenir.
+        </p>
       </div>
     </div>
   </div>
 
-  <div id="result" class="result-card" style="display:none">
-    <div class="res-grid">
-      <div class="res-item">
-        <div class="res-label">Toplam Çözgü Tel</div>
-        <div class="res-val" id="r-tel" style="color:var(--warp)"></div>
-      </div>
-      <div class="res-item">
-        <div class="res-label">Ham Gramaj (g/m)</div>
-        <div class="res-val" id="r-gr"></div>
-      </div>
-      <div class="res-item">
-        <div class="res-label">Birim Fiyat ($/m)</div>
-        <div class="res-val total" id="r-usd"></div>
-      </div>
-      <div class="res-item" style="border:none">
-        <div class="res-label">Birim Fiyat (TL/m)</div>
-        <div class="res-val total" id="r-tl" style="color:var(--accent2)"></div>
-      </div>
-    </div>
-    
-    <div class="plan-panel">
-      <div class="plan-title">📦 <span id="target-title">1000</span> Metre İçin İplik İhtiyacı (Fire Dahil)</div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px">
-        <div id="warp-needs" style="font-size:12px"></div>
-        <div id="weft-needs" style="font-size:12px"></div>
-      </div>
-    </div>
-
-    <div class="res-breakdown">
-      <div>
-        <div class="break-row"><span>Çözgü İplik Maliyeti:</span><span id="b-warp" style="color:var(--warp2)"></span></div>
-        <div class="break-row"><span>Atkı İplik Maliyeti:</span><span id="b-weft" style="color:var(--weft2)"></span></div>
-      </div>
-      <div>
-        <div class="break-row"><span>Dokuma İşçilik:</span><span id="b-work"></span></div>
-        <div class="break-row"><span>Toplam Ek Gider:</span><span id="b-extra" style="color:var(--extra)"></span></div>
+  <!-- ÜRETİM & HESAPLA -->
+  <div class="panel" style="animation-delay:.18s">
+    <div class="ph"><div class="ph-ico ic-c">🏭</div><span class="ph-title" style="color:var(--text)">Üretim Planlama & Kur</span></div>
+    <div class="pb">
+      <div style="display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap">
+        <div class="field" style="width:160px">
+          <label class="fl">Üretilecek Miktar (m)</label>
+          <input type="number" id="target-m" value="1000" min="1" oninput="calculate()">
+        </div>
+        <div class="field" style="width:160px">
+          <label class="fl">USD/TRY Kuru</label>
+          <input type="number" id="fx" value="34.20" step="0.01" min="1">
+        </div>
+        <div id="kur-status" style="align-self:flex-end;margin-bottom:2px;font-size:10px;color:var(--t3);padding:5px 10px;background:var(--s3);border:1px solid var(--b1);border-radius:20px;white-space:nowrap">Kur yükleniyor…</div>
+        <div style="margin-left:auto;display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+          <button class="btn btn-sec" onclick="openFis()">📄 Fiş Oluştur</button>
+          <button class="btn btn-calc" onclick="calculate()">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M3.5 6.5h6M6.5 3.5v6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            HESAPLA VE ANALİZ ET
+          </button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<div id="fis-overlay" onclick="closeFis()">
-  <div class="fis-content" onclick="event.stopPropagation()">
-    <div class="fis-header">
-      <div class="fis-logo">HENTEKS</div>
-      <div style="font-size:10px; margin-top:5px; font-weight: bold; letter-spacing: 1px;">TEKNİK MALİYET & TEKLİF FİŞİ</div>
+  <!-- SONUÇ -->
+  <div id="result" class="res-panel" style="display:none">
+    <div class="ph" style="background:rgba(58,232,160,.05)">
+      <div class="ph-ico ic-a">✅</div>
+      <span class="ph-title" style="color:var(--green)">Hesaplama Sonucu</span>
+      <span class="ph-badge" id="res-ts" style="color:var(--green);border-color:rgba(58,232,160,.2)"></span>
     </div>
+    <div class="res-top">
+      <div class="rc">
+        <div class="rc-lbl">Toplam Çözgü Teli</div>
+        <div class="rc-val" id="r-tel" style="color:var(--warp2)">—</div>
+      </div>
+      <div class="rc">
+        <div class="rc-lbl">Ham Gramaj (g/m)</div>
+        <div class="rc-val" id="r-gr">—</div>
+        <div class="rc-sub">çözgü + atkı</div>
+      </div>
+      <div class="rc">
+        <div class="rc-lbl">Birim Fiyat ($/m)</div>
+        <div class="rc-val big" id="r-usd">—</div>
+      </div>
+      <div class="rc">
+        <div class="rc-lbl">Birim Fiyat (TL/m)</div>
+        <div class="rc-val blue" id="r-tl">—</div>
+        <div class="rc-sub" id="r-kur-note"></div>
+      </div>
+    </div>
+
+    <div class="needs-wrap">
+      <div class="needs-hd">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x=".5" y=".5" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.2" opacity=".5"/><path d="M3.5 6.5h6M6.5 3.5v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <span id="target-title">1000</span>&nbsp;Metre İçin İplik İhtiyacı&nbsp;<span style="color:var(--t3)">(Fire Dahil)</span>
+      </div>
+      <div class="needs-grid">
+        <div class="needs-box">
+          <div class="nb-title" style="color:var(--warp2)">🧵 Çözgü</div>
+          <div id="warp-needs"></div>
+        </div>
+        <div class="needs-box">
+          <div class="nb-title" style="color:var(--weft2)">🪡 Atkı</div>
+          <div id="weft-needs"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bkd">
+      <div class="bkd-col">
+        <div class="bk-row"><span class="bk-lbl">Çözgü İplik Maliyeti</span><span class="bk-val bk-warp" id="b-warp">—</span></div>
+        <div class="bk-row"><span class="bk-lbl">Atkı İplik Maliyeti</span><span class="bk-val bk-weft" id="b-weft">—</span></div>
+      </div>
+      <div class="bkd-col">
+        <div class="bk-row"><span class="bk-lbl">Dokuma İşçilik</span><span class="bk-val bk-work" id="b-work">—</span></div>
+        <div class="bk-row"><span class="bk-lbl">Toplam Ek Gider</span><span class="bk-val bk-extra" id="b-extra">—</span></div>
+        <div class="bk-row" style="border-top:1px solid var(--b2);margin-top:6px;padding-top:8px">
+          <span class="bk-lbl" style="color:var(--text);font-weight:700">TOPLAM / m</span>
+          <span class="bk-val bk-total" id="b-total">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<!-- ══ FİŞ MODAL ══ -->
+<div class="modal-bg" id="modal" onclick="closeFis()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="fis-logo">HENTEKS</div>
+    <div class="fis-tag">TEKNİK MALİYET &amp; TEKLİF FİŞİ</div>
+    <hr class="fis-hl">
     <div id="fis-body"></div>
-    <div class="fis-footer">
-      Bu hesaplama Henteks Dijital Altyapısı ile oluşturulmuştur.<br>
-      Tarih: <span id="fis-date"></span>
-    </div>
-    <button class="btn btn-wa" onclick="sendWhatsApp()">WHATSAPP İLE PAYLAŞ</button>
-    <button class="btn" onclick="closeFis()" style="width:100%; margin-top:10px; background:#f0f0f0; color:#000; font-weight:700; border-radius: 0; border: 1px solid #ccc">KAPAT</button>
+    <div class="fis-footer">Bu hesaplama Henteks Dijital Altyapısı ile oluşturulmuştur.<br>Tarih: <span id="fis-date"></span></div>
+    <button class="btn-wa" onclick="sendWhatsApp()">
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M12.5 2.5A6.5 6.5 0 1 0 7 13.5a6.48 6.48 0 0 0 3.5-1.02L13.5 13l-.98-2.99A6.48 6.48 0 0 0 12.5 2.5Z" stroke="currentColor" stroke-width="1.3"/></svg>
+      WhatsApp ile Paylaş
+    </button>
+    <button class="modal-close-btn" onclick="closeFis()">KAPAT</button>
   </div>
 </div>
 
 <script>
+// ══════════════════════════════════════════════════
+//  TEMA
+// ══════════════════════════════════════════════════
+function toggleTheme() {
+  const html  = document.documentElement;
+  const dark  = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', dark ? 'light' : 'dark');
+  document.getElementById('theme-icon').textContent = dark ? '🌙' : '☀️';
+  document.getElementById('theme-lbl').textContent  = dark ? 'Koyu Tema' : 'Açık Tema';
+}
+
+// ══════════════════════════════════════════════════
+//  NUMARA → TEX  (orijinal mantık)
+// ══════════════════════════════════════════════════
+function getTex(n, u) {
+  n = parseFloat(n) || 0;
+  if (u === 'd')    return n / 9;
+  if (u === 'ne')   return 590.5 / n;
+  if (u === 'nm')   return 1000  / n;
+  if (u === 'dtex') return n / 10;
+  if (u === 'tex')  return n;
+  return n / 9;
+}
+
+// dönüşüm badge HTML
+function cvHtml(no, unit) {
+  const t = getTex(no, unit);
+  if (!t || !no) return '';
+  return `<div class="cv-wrap">
+    <span class="cv cv-d">${(t*9).toFixed(1)} Dn</span>
+    <span class="cv cv-dt">${(t*10).toFixed(1)} dtex</span>
+    <span class="cv cv-t">${t.toFixed(2)} tex</span>
+    <span class="cv cv-ne">Ne ${(590.5/t).toFixed(1)}</span>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════
+//  SATIRLAR
+// ══════════════════════════════════════════════════
+let rowId = 0;
+
 function addRow(type) {
-  const b = document.getElementById(type + '-body');
+  const b  = document.getElementById(type + '-body');
+  const id = ++rowId;
+
+  // ana satır
   const tr = document.createElement('tr');
+  tr.id = `tr-${id}`;
   tr.innerHTML = `
-    <td><input type="text" class="name" value="${type==='warp'?'Zemin':'Zemin'}"></td>
-    <td><input type="number" class="n" value="20" style="width:50px"></td>
-    <td><select class="u" style="width:60px"><option value="d">Dny</option><option value="ne">Ne</option></select></td>
-    <td><input type="number" class="k" value="1" style="width:40px"></td>
-    <td><input type="number" class="r" value="1" style="width:50px" title="Rapor/Desen Oranı"></td>
-    <td><input type="number" class="p" value="6.50" style="width:60px"></td>
-    <td><button onclick="this.parentElement.parentElement.remove()" style="color:var(--danger); border:none; background:none; cursor:pointer; font-size:16px">×</button></td>
+    <td><input type="text" class="name" value="${type==='warp'?'Zemin':'Zemin'}" style="min-width:70px"></td>
+    <td><input type="number" class="n" value="20" min="0.1" step="0.5" style="width:50px"
+        oninput="updateCv(${id})" onchange="updateCv(${id})"></td>
+    <td><select class="u" style="width:82px" onchange="updateCv(${id})">
+      <option value="d">Dny</option>
+      <option value="ne">Ne (pamuk)</option>
+      <option value="nm">Nm (metrik)</option>
+      <option value="dtex">Dtex</option>
+      <option value="tex">Tex</option>
+    </select></td>
+    <td><input type="number" class="k" value="1" min="1" max="20" style="width:36px"></td>
+    <td><input type="number" class="r" value="1" min="0" step="0.5" style="width:46px"></td>
+    <td><input type="number" class="p" value="6.50" min="0" step="0.01" style="width:58px"></td>
+    <td><button class="btn-del" onclick="removeRow(${id})" title="Sil">×</button></td>
   `;
   b.appendChild(tr);
+
+  // dönüşüm satırı
+  const cvTr = document.createElement('tr');
+  cvTr.id = `cv-${id}`;
+  cvTr.className = 'cv-row';
+  cvTr.innerHTML = `<td colspan="7"><div id="cvd-${id}"></div></td>`;
+  b.appendChild(cvTr);
+
+  updateCv(id);
+}
+
+function removeRow(id) {
+  const tr   = document.getElementById(`tr-${id}`);
+  const cvTr = document.getElementById(`cv-${id}`);
+  if (tr)   tr.remove();
+  if (cvTr) cvTr.remove();
+}
+
+function updateCv(id) {
+  const tr = document.getElementById(`tr-${id}`);
+  if (!tr) return;
+  const no   = tr.querySelector('.n')?.value;
+  const unit = tr.querySelector('.u')?.value;
+  const el   = document.getElementById(`cvd-${id}`);
+  if (el) el.innerHTML = cvHtml(no, unit);
 }
 
 function addExtraRow() {
-  const b = document.getElementById('extra-body');
+  const b  = document.getElementById('extra-body');
   const tr = document.createElement('tr');
   tr.innerHTML = `
-    <td><input type="text" class="e-name" value="Hazırlık / Devere"></td>
-    <td><input type="number" class="e-val" value="0.10"></td>
-    <td><select class="e-unit"><option value="m">$/metre</option></select></td>
-    <td><button onclick="this.parentElement.parentElement.remove()" style="color:var(--danger); border:none; background:none; cursor:pointer; font-size:16px">×</button></td>
+    <td><input type="text" class="e-name" value="Hazırlık / Devere" style="min-width:150px"></td>
+    <td><input type="number" class="e-val" value="0.10" min="0" step="0.001" style="width:90px"></td>
+    <td><button class="btn-del" onclick="this.closest('tr').remove()" title="Sil">×</button></td>
   `;
   b.appendChild(tr);
 }
 
-function getTex(n, u) { return u === 'ne' ? 590.5 / n : n / 9; }
+// ══════════════════════════════════════════════════
+//  KUR ÇEKİMİ
+// ══════════════════════════════════════════════════
+async function fetchKur() {
+  const dot    = document.getElementById('kur-dot');
+  const status = document.getElementById('kur-status');
+  const hkur   = document.getElementById('header-kur');
 
+  const setVal = (val) => {
+    document.getElementById('fx').value = val.toFixed(4);
+    hkur.textContent = val.toFixed(2) + ' ₺';
+    dot.classList.add('live');
+    status.textContent = '✓ Kur güncel · ' + new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+    status.style.color = 'var(--green)';
+  };
+
+  // 1. TCMB (allorigins proxy)
+  try {
+    const proxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://www.tcmb.gov.tr/kurlar/today.xml');
+    const res   = await fetch(proxy, { signal: AbortSignal.timeout(7000) });
+    const data  = await res.json();
+    const xml   = new DOMParser().parseFromString(data.contents, 'text/xml');
+    const usdEl = xml.querySelector('Currency[Kod="USD"] ForexSelling');
+    if (!usdEl) throw new Error('no USD');
+    setVal(parseFloat(usdEl.textContent.replace(',', '.')));
+    return;
+  } catch(_) {}
+
+  // 2. exchangerate-api (ücretsiz, CORS açık)
+  try {
+    const r = await fetch('https://open.er-api.com/v6/latest/USD', { signal: AbortSignal.timeout(6000) });
+    const j = await r.json();
+    if (j.rates && j.rates.TRY) { setVal(j.rates.TRY); return; }
+  } catch(_) {}
+
+  // başarısız
+  dot.classList.add('err');
+  hkur.textContent = document.getElementById('fx').value + ' ₺';
+  status.textContent = '⚠ Kur alınamadı — manuel giriniz';
+  status.style.color = 'var(--warp)';
+}
+
+// ══════════════════════════════════════════════════
+//  HESAPLAMA — orijinal mantık
+// ══════════════════════════════════════════════════
 let lastCalculated = null;
 
 function calculate() {
-  const rNo = parseFloat(document.getElementById('reed-no').value);
-  const rD = parseFloat(document.getElementById('reed-dent').value);
-  const en = parseFloat(document.getElementById('warp-width').value);
-  const wWaste = 1 + (parseFloat(document.getElementById('warp-waste').value)/100);
-  const fx = parseFloat(document.getElementById('fx').value);
-  const targetM = parseFloat(document.getElementById('target-m').value) || 1000;
-  const weaveType = document.getElementById('weave-type').value;
+  const rNo      = parseFloat(document.getElementById('reed-no').value)    || 0;
+  const rD       = parseFloat(document.getElementById('reed-dent').value)  || 0;
+  const en       = parseFloat(document.getElementById('warp-width').value) || 0;
+  const wWaste   = 1 + (parseFloat(document.getElementById('warp-waste').value) || 0) / 100;
+  const fx       = parseFloat(document.getElementById('fx').value)          || 34.20;
+  const targetM  = parseFloat(document.getElementById('target-m').value)    || 1000;
+  const weaveType= document.getElementById('weave-type').value;
   const custName = document.getElementById('cust-name').value;
-  const notes = document.getElementById('app-notes').value;
+  const notes    = document.getElementById('app-notes').value;
+  const aDens    = parseFloat(document.getElementById('weft-dens').value)  || 0;
+  const aEn      = parseFloat(document.getElementById('weft-width').value) || 0;
+  const aWaste   = 1 + (parseFloat(document.getElementById('weft-waste').value) || 0) / 100;
 
   const totalTel = (rNo * rD) * en;
 
-  // ÇÖZGÜ ORAN
+  // ── ÇÖZGÜ
   let totalWarpRepeat = 0;
-  document.querySelectorAll('#warp-body tr').forEach(tr => { totalWarpRepeat += parseFloat(tr.querySelector('.r').value) || 0; });
+  document.querySelectorAll('#warp-body tr.cv-row').forEach(() => {});   // skip cv rows
+  document.querySelectorAll('#warp-body tr[id^="tr-"]').forEach(tr => {
+    totalWarpRepeat += parseFloat(tr.querySelector('.r')?.value) || 0;
+  });
 
   let cGrTotal = 0, cCostTotal = 0;
-  let warpList = [], warpKgList = [];
-  
-  document.querySelectorAll('#warp-body tr').forEach(tr => {
-    const name = tr.querySelector('.name').value;
-    const no = tr.querySelector('.n').value;
-    const unitSelect = tr.querySelector('.u');
-    const unitText = unitSelect.options[unitSelect.selectedIndex].text;
-    const unitVal = unitSelect.value;
-    const kat = tr.querySelector('.k').value;
-    const repeat = parseFloat(tr.querySelector('.r').value) || 0;
-    const ratio = totalWarpRepeat > 0 ? (repeat / totalWarpRepeat) : 0;
+  const warpList = [], warpKgList = [];
+
+  document.querySelectorAll('#warp-body tr[id^="tr-"]').forEach(tr => {
+    const name   = tr.querySelector('.name')?.value || '';
+    const no     = tr.querySelector('.n')?.value    || 0;
+    const unitSel= tr.querySelector('.u');
+    const unitVal= unitSel ? unitSel.value : 'd';
+    const unitTxt= unitSel ? unitSel.options[unitSel.selectedIndex].text : 'Dny';
+    const kat    = parseFloat(tr.querySelector('.k')?.value) || 1;
+    const repeat = parseFloat(tr.querySelector('.r')?.value) || 0;
+    const price  = parseFloat(tr.querySelector('.p')?.value) || 0;
+
+    const ratio     = totalWarpRepeat > 0 ? (repeat / totalWarpRepeat) : 0;
     const actualTel = Math.round(totalTel * ratio);
-    const tex = getTex(no, unitVal) * kat;
-    const weightPerM = (actualTel * tex) / 1000 * wWaste;
-    
-    cGrTotal += weightPerM;
-    cCostTotal += (weightPerM/1000) * parseFloat(tr.querySelector('.p').value);
-    warpList.push(`${no}/${kat} ${unitText} ${name}`);
-    warpKgList.push({ 
-      name, 
-      kg: (weightPerM * targetM) / 1000, 
-      info: `${no}/${kat} ${unitText} (%${Math.round(ratio*100)})`, 
-      gr: weightPerM, 
-      repeat: repeat 
-    });
+    const tex       = getTex(no, unitVal) * kat;
+    const weightPerM= (actualTel * tex) / 1000 * wWaste;
+
+    cGrTotal   += weightPerM;
+    cCostTotal += (weightPerM / 1000) * price;
+    warpList.push(`${no}/${kat} ${unitTxt} ${name}`);
+    warpKgList.push({ name, no, kat, unitTxt, repeat, kg: (weightPerM * targetM) / 1000, gr: weightPerM });
   });
 
-  // ATKI ORAN
-  const aDens = parseFloat(document.getElementById('weft-dens').value);
-  const aEn = parseFloat(document.getElementById('weft-width').value);
-  const aWaste = 1 + (parseFloat(document.getElementById('weft-waste').value)/100);
+  // ── ATKI
   let totalWeftRepeat = 0;
-  document.querySelectorAll('#weft-body tr').forEach(tr => { totalWeftRepeat += parseFloat(tr.querySelector('.r').value) || 0; });
-  
-  let aGrTotal = 0, aCostTotal = 0;
-  let weftList = [], weftKgList = [];
-  document.querySelectorAll('#weft-body tr').forEach(tr => {
-    const name = tr.querySelector('.name').value;
-    const no = tr.querySelector('.n').value;
-    const unitSelect = tr.querySelector('.u');
-    const unitText = unitSelect.options[unitSelect.selectedIndex].text;
-    const unitVal = unitSelect.value;
-    const kat = tr.querySelector('.k').value;
-    const repeat = parseFloat(tr.querySelector('.r').value) || 0;
-    const ratio = totalWeftRepeat > 0 ? (repeat / totalWeftRepeat) : 0;
-    const tex = getTex(no, unitVal) * kat;
-    const weightPerM = ((aDens * ratio) * aEn * tex) / 1000 * aWaste;
-
-    aGrTotal += weightPerM;
-    aCostTotal += (weightPerM/1000) * parseFloat(tr.querySelector('.p').value);
-    weftList.push(`${no}/${kat} ${unitText} ${name}`);
-    weftKgList.push({ 
-      name, 
-      kg: (weightPerM * targetM) / 1000, 
-      info: `${no}/${kat} ${unitText} (%${Math.round(ratio*100)})`, 
-      gr: weightPerM, 
-      repeat: repeat 
-    });
+  document.querySelectorAll('#weft-body tr[id^="tr-"]').forEach(tr => {
+    totalWeftRepeat += parseFloat(tr.querySelector('.r')?.value) || 0;
   });
 
-  const work = aDens * parseFloat(document.getElementById('weave-price').value);
+  let aGrTotal = 0, aCostTotal = 0;
+  const weftList = [], weftKgList = [];
+
+  document.querySelectorAll('#weft-body tr[id^="tr-"]').forEach(tr => {
+    const name   = tr.querySelector('.name')?.value || '';
+    const no     = tr.querySelector('.n')?.value    || 0;
+    const unitSel= tr.querySelector('.u');
+    const unitVal= unitSel ? unitSel.value : 'd';
+    const unitTxt= unitSel ? unitSel.options[unitSel.selectedIndex].text : 'Dny';
+    const kat    = parseFloat(tr.querySelector('.k')?.value) || 1;
+    const repeat = parseFloat(tr.querySelector('.r')?.value) || 0;
+    const price  = parseFloat(tr.querySelector('.p')?.value) || 0;
+
+    const ratio     = totalWeftRepeat > 0 ? (repeat / totalWeftRepeat) : 0;
+    const tex       = getTex(no, unitVal) * kat;
+    const weightPerM= ((aDens * ratio) * aEn * tex) / 1000 * aWaste;
+
+    aGrTotal   += weightPerM;
+    aCostTotal += (weightPerM / 1000) * price;
+    weftList.push(`${no}/${kat} ${unitTxt} ${name}`);
+    weftKgList.push({ name, no, kat, unitTxt, repeat, kg: (weightPerM * targetM) / 1000, gr: weightPerM });
+  });
+
+  // ── İŞÇİLİK & EK
+  const workCost = aDens * parseFloat(document.getElementById('weave-price').value || 0);
   let extraTotal = 0;
-  document.querySelectorAll('#extra-body tr').forEach(tr => { extraTotal += parseFloat(tr.querySelector('.e-val').value); });
-  const totalUsd = cCostTotal + aCostTotal + work + extraTotal;
+  document.querySelectorAll('#extra-body tr').forEach(tr => {
+    extraTotal += parseFloat(tr.querySelector('.e-val')?.value) || 0;
+  });
+
+  const totalUsd = cCostTotal + aCostTotal + workCost + extraTotal;
+  const totalTry = totalUsd * fx;
+
+  // ── EKRANA YAZ
+  const panel = document.getElementById('result');
+  panel.style.display = 'block';
+  panel.scrollIntoView({ behavior:'smooth', block:'nearest' });
+
+  document.getElementById('res-ts').textContent    = new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('r-tel').textContent     = Math.round(totalTel).toLocaleString('tr-TR');
+  document.getElementById('r-gr').textContent      = Math.round(cGrTotal + aGrTotal) + ' g/m';
+  document.getElementById('r-usd').textContent     = '$' + totalUsd.toFixed(3);
+  document.getElementById('r-tl').textContent      = totalTry.toFixed(2) + ' ₺';
+  document.getElementById('r-kur-note').textContent= 'Kur: ' + fx.toFixed(2);
+  document.getElementById('b-warp').textContent    = '$' + cCostTotal.toFixed(3);
+  document.getElementById('b-weft').textContent    = '$' + aCostTotal.toFixed(3);
+  document.getElementById('b-work').textContent    = '$' + workCost.toFixed(3);
+  document.getElementById('b-extra').textContent   = '$' + extraTotal.toFixed(3);
+  document.getElementById('b-total').textContent   = '$' + totalUsd.toFixed(3);
+  document.getElementById('target-title').textContent = targetM.toLocaleString('tr-TR');
+
+  const makeNeedsHtml = (list, cls) => list.length
+    ? list.map(i => `<div class="nb-row">
+        <span class="nb-name">${i.name} <em style="color:var(--t3);font-size:10px">(${i.no}×${i.kat} ${i.unitTxt}, ${i.repeat} rap)</em></span>
+        <span class="nb-kg ${cls}">${i.kg.toFixed(2)} kg</span>
+      </div>`).join('')
+    : '<div style="color:var(--t3);font-size:11px">İplik eklenmedi</div>';
+
+  document.getElementById('warp-needs').innerHTML = makeNeedsHtml(warpKgList, 'w');
+  document.getElementById('weft-needs').innerHTML = makeNeedsHtml(weftKgList, 'a');
 
   lastCalculated = {
-    totalTel, cGrTotal, aGrTotal, totalUsd, fx, cCostTotal, aCostTotal, work, extraTotal, targetM, 
-    weaveType, custName, notes, warpList, weftList, warpKgList, weftKgList,
-    reed: document.getElementById('reed-no').value, dent: document.getElementById('reed-dent').value,
-    width: document.getElementById('warp-width').value, dens: aDens
+    totalTel, cGrTotal, aGrTotal, totalUsd, totalTry, fx,
+    cCostTotal, aCostTotal, workCost, extraTotal,
+    targetM, weaveType, custName, notes,
+    warpList, weftList, warpKgList, weftKgList,
+    reed: rNo, dent: rD, width: en, dens: aDens
   };
-
-  document.getElementById('result').style.display = 'block';
-  document.getElementById('r-tel').innerText = Math.round(totalTel).toLocaleString('tr-TR');
-  document.getElementById('r-gr').innerText = Math.round(cGrTotal + aGrTotal) + " g/m";
-  document.getElementById('r-usd').innerText = "$" + totalUsd.toFixed(3);
-  document.getElementById('r-tl').innerText = (totalUsd * fx).toFixed(2) + " ₺";
-  document.getElementById('target-title').innerText = targetM;
-  document.getElementById('b-warp').innerText = "$" + cCostTotal.toFixed(3);
-  document.getElementById('b-weft').innerText = "$" + aCostTotal.toFixed(3);
-  document.getElementById('b-work').innerText = "$" + work.toFixed(3);
-  document.getElementById('b-extra').innerText = "$" + extraTotal.toFixed(3);
-  
-  let warpNeedsHtml = '<strong>Çözgü İhtiyaç:</strong><br>';
-  warpKgList.forEach(i => warpNeedsHtml += `- ${i.name} (${i.repeat} tel): ${i.kg.toFixed(2)} kg<br>`);
-  document.getElementById('warp-needs').innerHTML = warpNeedsHtml;
-  
-  let weftNeedsHtml = '<strong>Atkı İhtiyaç:</strong><br>';
-  weftKgList.forEach(i => weftNeedsHtml += `- ${i.name} (${i.repeat} atkı): ${i.kg.toFixed(2)} kg<br>`);
-  document.getElementById('weft-needs').innerHTML = weftNeedsHtml;
 }
 
+// ══════════════════════════════════════════════════
+//  FİŞ  (TL satırı YOK)
+// ══════════════════════════════════════════════════
 function openFis() {
-  if(!lastCalculated) calculate();
+  if (!lastCalculated) calculate();
   const d = lastCalculated;
-  const now = new Date().toLocaleDateString('tr-TR');
-  const showProd = document.getElementById('show-prod-on-fis').checked;
+  const showProd  = document.getElementById('show-prod-on-fis').checked;
   const showNotes = document.getElementById('show-notes-on-fis').checked;
-  
-  let body = `
-    ${d.custName ? `<div class="fis-row"><span>Müşteri:</span><span style="font-weight:800">${d.custName}</span></div>` : ''}
-    <div class="fis-row"><span>Örgü / Armür:</span><span>${d.weaveType}</span></div>
-    
-    <div class="fis-section-title">Teknik Detaylar</div>
-    <div class="fis-row"><span>Tarak / Diş:</span><span>${d.reed} / ${d.dent}</span></div>
-    <div class="fis-row"><span>Kumaş Eni:</span><span>${d.width} cm</span></div>
-    <div class="fis-row"><span>Toplam Tel:</span><span>${Math.round(d.totalTel).toLocaleString('tr-TR')}</span></div>
-    <div class="fis-row"><span>Atkı Sıklığı:</span><span>${d.dens} tel/cm</span></div>
-    <div class="fis-row"><span>Ham Gramaj:</span><span>${Math.round(d.cGrTotal + d.aGrTotal)} g/m</span></div>
-    
-    <div class="fis-section-title">Kullanılan İplikler</div>
-    <div class="fis-row" style="display:block; font-size:10px; color:#333; margin-bottom:5px">
-      <strong>Çözgü:</strong> ${d.warpList.join(' | ')}<br>
-      <strong>Atkı:</strong> ${d.weftList.join(' | ')}
-    </div>
 
-    ${showNotes && d.notes ? `
-      <div class="fis-section-title">Açıklamalar</div>
-      <div style="font-size:10px; background:#f9f9f9; padding:8px; border:1px solid #eee; white-space: pre-wrap;">${d.notes}</div>
-    ` : ''}
+  let html = '';
+  if (d.custName) html += `<div class="fis-row"><span>Müşteri / Proje:</span><span>${d.custName}</span></div>`;
+  html += `<div class="fis-row"><span>Örgü / Armür:</span><span>${d.weaveType}</span></div>`;
+  html += `<hr class="fis-hl2">`;
+  html += `<div class="fis-st">Teknik Detaylar</div>`;
+  html += `<div class="fis-row"><span>Tarak No / Diş:</span><span>${d.reed} / ${d.dent}</span></div>`;
+  html += `<div class="fis-row"><span>Kumaş Eni:</span><span>${d.width} cm</span></div>`;
+  html += `<div class="fis-row"><span>Toplam Çözgü Teli:</span><span>${Math.round(d.totalTel).toLocaleString('tr-TR')}</span></div>`;
+  html += `<div class="fis-row"><span>Atkı Sıklığı:</span><span>${d.dens} tel/cm</span></div>`;
+  html += `<div class="fis-row"><span>Ham Gramaj:</span><span>${Math.round(d.cGrTotal + d.aGrTotal)} g/m</span></div>`;
 
-    <div class="fis-section-title">Maliyet Dökümü</div>
-    <div class="fis-row"><span>Çözgü Toplam:</span><span>$${d.cCostTotal.toFixed(3)}</span></div>
-    <div class="fis-row"><span>Atkı Toplam:</span><span>$${d.aCostTotal.toFixed(3)}</span></div>
-    <div class="fis-row"><span>Dokuma İşçilik:</span><span>$${d.work.toFixed(3)}</span></div>
-    <div class="fis-row"><span>Ek Giderler:</span><span>$${d.extraTotal.toFixed(3)}</span></div>
-    
-    <div class="fis-total">
-      <div class="fis-row" style="font-size:18px"><span>TOPLAM BİRİM FİYAT:</span><span>$${d.totalUsd.toFixed(3)}</span></div>
-      <div class="fis-row" style="font-size:12px; margin-top:5px; color:#555"><span>BİRİM FİYAT (TL):</span><span>${(d.totalUsd * d.fx).toFixed(2)} ₺</span></div>
-    </div>
-  `;
+  html += `<div class="fis-st">Kullanılan İplikler</div>`;
+  if (d.warpList.length) html += `<div style="font-size:10px;line-height:1.7;margin-bottom:4px"><strong>Çözgü:</strong> ${d.warpList.join(' · ')}</div>`;
+  if (d.weftList.length) html += `<div style="font-size:10px;line-height:1.7"><strong>Atkı:</strong> ${d.weftList.join(' · ')}</div>`;
 
-  if(showProd) {
-    body += `
-      <div style="margin-top:15px; border-top:1px dashed #000; padding-top:10px">
-        <div class="fis-section-title">Üretim Planı (${d.targetM} Metre)</div>
-        <div class="fis-row" style="font-weight:bold; border-bottom:1px solid #eee; font-size:9px"><span>İplik Özelliği & Rapor</span><span>Miktar (kg)</span></div>
-        ${d.warpKgList.map(item => `<div class="fis-row" style="font-size:10px"><span>${item.info} ${item.name} (${item.repeat} tel/rap) [${item.gr.toFixed(1)} g/m]</span><span>${item.kg.toFixed(2)} kg</span></div>`).join('')}
-        ${d.weftKgList.map(item => `<div class="fis-row" style="font-size:10px"><span>${item.info} ${item.name} (${item.repeat} atkı/rap) [${item.gr.toFixed(1)} g/m]</span><span>${item.kg.toFixed(2)} kg</span></div>`).join('')}
-      </div>
-    `;
+  if (showNotes && d.notes) {
+    html += `<div class="fis-st">Açıklamalar</div>`;
+    html += `<div style="font-size:10px;background:#f5f5f5;padding:8px 10px;border-radius:3px;white-space:pre-wrap;line-height:1.6">${d.notes}</div>`;
   }
-  
-  document.getElementById('fis-body').innerHTML = body;
-  document.getElementById('fis-date').innerText = now;
-  document.getElementById('fis-overlay').style.display = 'flex';
+
+  html += `<div class="fis-st">Maliyet Dökümü ($/m)</div>`;
+  html += `<div class="fis-row"><span>Çözgü İplik Maliyeti:</span><span>$${d.cCostTotal.toFixed(3)}</span></div>`;
+  html += `<div class="fis-row"><span>Atkı İplik Maliyeti:</span><span>$${d.aCostTotal.toFixed(3)}</span></div>`;
+  html += `<div class="fis-row"><span>Dokuma İşçilik:</span><span>$${d.workCost.toFixed(3)}</span></div>`;
+  if (d.extraTotal > 0)
+    html += `<div class="fis-row"><span>Toplam Ek Gider:</span><span>$${d.extraTotal.toFixed(3)}</span></div>`;
+
+  // TL SATIRI YOK — sadece USD
+  html += `<div class="fis-total"><div class="fis-row"><span>BİRİM FİYAT:</span><span>$${d.totalUsd.toFixed(3)}</span></div></div>`;
+
+  if (showProd) {
+    html += `<hr class="fis-hl2">`;
+    html += `<div class="fis-st">Üretim Planı — ${d.targetM.toLocaleString('tr-TR')} Metre</div>`;
+    html += `<div class="fis-prod-hd"><span>İplik / Özellik</span><span>Miktar (kg)</span></div>`;
+    d.warpKgList.forEach(i => {
+      html += `<div class="fis-prod-row"><span>${i.no}/${i.kat} ${i.unitTxt} ${i.name} (${i.repeat} tel/rap) · ${i.gr.toFixed(1)} g/m</span><span>${i.kg.toFixed(2)} kg</span></div>`;
+    });
+    d.weftKgList.forEach(i => {
+      html += `<div class="fis-prod-row"><span>${i.no}/${i.kat} ${i.unitTxt} ${i.name} (${i.repeat} atkı/rap) · ${i.gr.toFixed(1)} g/m</span><span>${i.kg.toFixed(2)} kg</span></div>`;
+    });
+  }
+
+  document.getElementById('fis-body').innerHTML = html;
+  document.getElementById('fis-date').textContent = new Date().toLocaleDateString('tr-TR');
+  document.getElementById('modal').classList.add('open');
 }
+
+function closeFis() { document.getElementById('modal').classList.remove('open'); }
 
 function sendWhatsApp() {
-  const d = lastCalculated;
-  if(!d) return;
-
-  let text = `*HENTEKS TEKNİK MALİYET FİŞİ*\n`;
-  text += `----------------------------------\n`;
-  if(d.custName) text += `*Müşteri:* ${d.custName}\n`;
-  text += `*Örgü:* ${d.weaveType}\n`;
-  text += `*En:* ${d.width} cm | *Sıklık:* ${d.dens} atkı\n`;
-  text += `*Ham Gramaj:* ${Math.round(d.cGrTotal + d.aGrTotal)} g/m\n`;
-  text += `----------------------------------\n`;
-  text += `*BİRİM FİYAT:* $${d.totalUsd.toFixed(3)}\n`;
-  text += `*BİRİM FİYAT (TL):* ${(d.totalUsd * d.fx).toFixed(2)} ₺\n`;
-  
-  if(document.getElementById('show-prod-on-fis').checked) {
-    text += `----------------------------------\n`;
-    text += `*Üretim Planı (${d.targetM} m):*\n`;
-    d.warpKgList.forEach(i => text += `• ${i.name} (${i.repeat} tel/rap): ${i.kg.toFixed(2)} kg\n`);
-    d.weftKgList.forEach(i => text += `• ${i.name} (${i.repeat} atkı/rap): ${i.kg.toFixed(2)} kg\n`);
+  const d = lastCalculated; if (!d) return;
+  let t = `*HENTEKS TEKNİK MALİYET FİŞİ*\n`;
+  if (d.custName) t += `Müşteri: ${d.custName}\n`;
+  t += `Örgü: ${d.weaveType} | En: ${d.width} cm | Sıklık: ${d.dens} atkı/cm\n`;
+  t += `Ham Gramaj: ${Math.round(d.cGrTotal+d.aGrTotal)} g/m\n`;
+  t += `─────────────────\n`;
+  t += `*BİRİM FİYAT: $${d.totalUsd.toFixed(3)}*\n`;
+  if (document.getElementById('show-prod-on-fis').checked) {
+    t += `─────────────────\n*${d.targetM} Metre İplik İhtiyacı:*\n`;
+    d.warpKgList.forEach(i => t += `• ${i.name}: ${i.kg.toFixed(2)} kg\n`);
+    d.weftKgList.forEach(i => t += `• ${i.name}: ${i.kg.toFixed(2)} kg\n`);
   }
-
-  if(document.getElementById('show-notes-on-fis').checked && d.notes) {
-    text += `----------------------------------\n`;
-    text += `*Notlar:* ${d.notes}\n`;
-  }
-
-  const encoded = encodeURIComponent(text);
-  window.open(`https://wa.me/?text=${encoded}`, '_blank');
+  if (document.getElementById('show-notes-on-fis').checked && d.notes)
+    t += `─────────────────\nNot: ${d.notes}\n`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(t), '_blank');
 }
 
-function closeFis() { document.getElementById('fis-overlay').style.display = 'none'; }
-
-window.onload = () => { addRow('warp'); addRow('weft'); addExtraRow(); };
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
+window.onload = () => {
+  addRow('warp');
+  addRow('weft');
+  addExtraRow();
+  fetchKur();
+};
 </script>
 </body>
 </html>
-
